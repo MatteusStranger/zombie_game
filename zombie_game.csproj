@@ -79,8 +79,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\scripts\Bala.cs" />
+    <Compile Include="Assets\scripts\ControlaArma.cs" />
     <Compile Include="Assets\scripts\ControlaCamera.cs" />
     <Compile Include="Assets\scripts\ControlaJogador.cs" />
+    <Compile Include="Assets\scripts\ControleInimigo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Modelos3D\Personagens\Animacoes\Animacoes.txt" />
