@@ -1,11 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ControlaJogador : MonoBehaviour {
 
     public float Velocidade = 16;
-    Vector3 direcao;
+    private Vector3 direcao;
+    public LayerMask MascaraChao;
+    public GameObject TextoGameOver;
+    public bool Vivo = true;
+    private Rigidbody rigidbodyJogador;
+    private Animator animatorJogador;
+
+    private void Start()
+    {
+        Time.timeScale = 1;
+        rigidbodyJogador = GetComponent<Rigidbody>();
+        animatorJogador = GetComponent<Animator>();
+    }
 
     void Update () {
         float eixoX = Input.GetAxis("Horizontal");
@@ -17,18 +30,42 @@ public class ControlaJogador : MonoBehaviour {
 
         if(direcao != Vector3.zero)
         {
-            GetComponent<Animator>().SetBool("Movendo", true);
+            animatorJogador.SetBool("Movendo", true);
         }
         else
         {
-            GetComponent<Animator>().SetBool("Movendo", false);
+            animatorJogador.SetBool("Movendo", false);
+        }
+
+        if (!Vivo)
+        {
+            if (Input.GetButtonDown("Fire1"))
+            {
+                SceneManager.LoadScene("game");
+            }
         }
 	}
 
     void FixedUpdate()
     {
-        GetComponent<Rigidbody>().MovePosition
-           (GetComponent<Rigidbody>().position +
+        rigidbodyJogador.MovePosition
+           (rigidbodyJogador.position +
            (direcao * Velocidade * Time.deltaTime));
+
+
+        Ray raio = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Debug.DrawRay(raio.origin, raio.direction * 100, Color.yellow);
+
+        RaycastHit impacto;
+
+        if (Physics.Raycast(raio, out impacto, 100, MascaraChao))
+        {
+            Vector3 posicaoMiraJogador = impacto.point - transform.position;
+
+            posicaoMiraJogador.y = transform.position.y;
+
+            Quaternion novaRotacao = Quaternion.LookRotation(posicaoMiraJogador);
+            rigidbodyJogador.MoveRotation(novaRotacao);
+        }
     }
 }
