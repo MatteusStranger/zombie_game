@@ -5,10 +5,18 @@ using UnityEngine;
 public class ControleInimigo : MonoBehaviour {
     public GameObject Jogador;
     public float Velocidade = 8;
+    private Rigidbody rigidbodyInimigo;
+    private Animator animatorInimigo;
+
+
     // Use this for initialization
     void Start () {
-		
-	}
+        Jogador = GameObject.FindWithTag("Jogador");
+        int geraTipoZumbi = Random.Range(1, 28);
+        transform.GetChild(geraTipoZumbi).gameObject.SetActive(true);
+        rigidbodyInimigo = GetComponent<Rigidbody>();
+        animatorInimigo = GetComponent<Animator>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -19,16 +27,28 @@ public class ControleInimigo : MonoBehaviour {
     {
         float distancia = Vector3.Distance(transform.position,Jogador.transform.position);
 
+        Vector3 direcao = Jogador.transform.position - transform.position;
+
+        Quaternion novaRotacao = Quaternion.LookRotation(direcao);
+        rigidbodyInimigo.MoveRotation(novaRotacao);
+
         if (distancia > 2.5)
         {
-            Vector3 direcao = Jogador.transform.position - transform.position;
-            GetComponent<Rigidbody>().MovePosition
-               (GetComponent<Rigidbody>().position +
+            rigidbodyInimigo.MovePosition
+               (rigidbodyInimigo.position +
                direcao.normalized * Velocidade * Time.deltaTime);
-
-            Quaternion novaRotacao = Quaternion.LookRotation(direcao);
-
-            GetComponent<Rigidbody>().MoveRotation(novaRotacao);
+            animatorInimigo.SetBool("Atacando", false);
         }
+        else
+        {
+            animatorInimigo.SetBool("Atacando", true);
+        }
+    }
+
+    void AtacaJogador()
+    {
+        Time.timeScale = 0;
+        Jogador.GetComponent<ControlaJogador>().TextoGameOver.SetActive(true);
+        Jogador.GetComponent<ControlaJogador>().Vivo = false;
     }
 }
